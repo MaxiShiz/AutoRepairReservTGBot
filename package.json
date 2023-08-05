@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "googleapis": "^74.0.0",
+    "moment-timezone": "^0.5.43",
+    "node-schedule": "^2.1.1",
+    "node-telegram-bot-api": "^0.61.0",
+    "readline-sync": "^1.4.10",
+    "sqlite3": "^5.1.6"
+  },
+  "name": "kwork",
+  "version": "1.0.0",
+  "main": "functions.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
