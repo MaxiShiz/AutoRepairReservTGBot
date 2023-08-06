@@ -44,6 +44,16 @@ const menubutton = {
   parse_mode: 'HTML'
 };
 
+const menubuttonadmcom = {
+    reply_markup: {
+    inline_keyboard: [[
+      { text: 'Меню', callback_data: 'mainmenu' },
+      { text: 'Ответить', callback_data: 'answerusertoadmin' }
+    ]]
+  },
+  parse_mode: 'HTML'
+};
+
 //Авторизация и создание клиента для работы с API
 async function getAuthorizedClient() {
   const credentials = JSON.parse(fs.readFileSync(KEYFILE));
@@ -348,7 +358,7 @@ bot.on('callback_query', async (query) => {
         `Услуга: ${reservationsData[bookingId].crash}\n` +
         `Дата: ${reservationsData[bookingId].date}\n` +
         `Время: ${reservationsData[bookingId].time}\n` +
-        `Комментарий: ${reservationsData[bookingId].comment}`, completebutton)
+        `Комментарий: ${reservationsData[bookingId].comment}`)
         .then ((sentMessage) => {
           const messageId = sentMessage.message_id;
           if (query.message) {
@@ -407,7 +417,7 @@ bot.on('callback_query', async (query) => {
       if (adminanswer[bookingId] && adminanswer[bookingId].step === "comment") {
     const bookingId = currentBookingId;
     adminanswer[bookingId].comment = messageText;
-    bot.sendMessage(reservationsData[bookingId].userId, adminanswer[bookingId].comment, menubutton);
+    bot.sendMessage(reservationsData[bookingId].userId, adminanswer[bookingId].comment, menubuttonadmcom);
     bot.sendMessage(AdminchatId, 'Сообщение успешно отправлено!')
     delete adminanswer[bookingId];
     }
@@ -1440,6 +1450,13 @@ bot.on('callback_query', async (query) => {
         bot.deleteMessage(query.message.chat.id, query.message.message_id);
       }
   });
+} else if (data === "answerusertoadmin") {
+  if (!userEditReserv[chatId]) {
+    userEditReserv[chatId] = {};
+  }
+
+  userEditReserv[chatId].step = "answerusertoadmin";
+  bot.sendMessage(chatId, "Введите сообщение для администратора:");
 }
 });
 
@@ -1520,6 +1537,38 @@ bot.on('message', async (msg) => {
       delete tempMsgEditResid[chatId];
       SendCommentAdmin(chatId);
       bot.sendMessage(chatId, comentrejmes, menubutton);
+  } else if (userEditReserv[chatId] && userEditReserv[chatId].step === "answerusertoadmin") {
+    let answerusertoadminmsg;
+      if (msg.photo && msg.photo.length > 0) {
+      // Обработчик фотографии и комментария
+      const photo = msg.photo;
+      const caption = msg.caption;
+      userEditReserv[chatId].answerusertoadmin = caption;
+      bot.sendPhoto(AdminchatId, photo[photo.length - 1].file_id);
+    } else {
+      userEditReserv[chatId].answerusertoadmin = messageText;
+    }
+
+    const usermessage = userEditReserv[chatId].answerusertoadmin;
+    db.all('SELECT * FROM reservations WHERE Статус IN (?, ?) AND chatId = ?', 
+      [...statusToCheck, chatId],
+      (err, rows) => {
+        if(err) {
+          console.error('Ошибка при выполнении запроса!');
+          return;
+      }
+
+    rows.forEach((row) => {
+      const bookingId = row.id;
+      const name = row.Имя;
+
+      answerusertoadminmsg = ` Пользователь ${name} дал свой ответ по заявке №${bookingId}:\n` +
+      `${usermessage}`;
+    });
+      bot.sendMessage(AdminchatId, answerusertoadminmsg);
+      bot.sendMessage(chatId, "Спасибо, сообщение отправлено!", menubutton);
+   });
+    delete userEditReserv[chatId];
   }
 });
 
