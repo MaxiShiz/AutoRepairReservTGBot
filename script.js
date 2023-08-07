@@ -1,6 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const functions = require('./functions'); //Импорт функций из файла
-const token = '6177110182:AAFdtZbxWEJGETydWPV0ObQ_Q8K7OnEqY_I'; //API-токен бота
+const token = '5938528546:AAEvGKSYW0rkp42x4B8zwJIp-vgoXHpLLLc'; //API-токен бота
 const bot = new TelegramBot(token, {polling: true}); //Создание бота
 const sqlite3 = require('sqlite3').verbose(); //Зависимость с БД
 const {google} = require('googleapis'); //Зависимость с API Google Cloud
@@ -19,8 +19,8 @@ const userState = {}; //Массив состояний
 const reservationsData = {};//Массив хранения заявок
 let currentBookingId; //Временная переменная заявки
 
-const CALENDAR_ID = 'cd0ebc3414398ebcd09fceccf2b09387a29ebae50a3b63149e760b504fec9d74@group.calendar.google.com'; //Идентификатор календаря
-const KEYFILE = 'level-studio-393414-12725bc69ea5.json'; //Путь к JSON файлу
+const CALENDAR_ID = '9b4168e6710547f5f99cc0b1ca9d468fcdee49436b0fff4a160e78de1b2a42f0@group.calendar.google.com'; //Идентификатор календаря
+const KEYFILE = 'reserv-calendar-bot-d9f4206b556b.json'; //Путь к JSON файлу
 const SCOPE_CALENDAR = 'https://www.googleapis.com/auth/calendar'; //Интеграция модуля календаря
 const SCOPE_EVENTS = 'https://www.googleapis.com/auth/calendar.events'; //Интеграция модуля событий 
 const SCOPE_READONLY = 'https://www.googleapis.com/auth/calendar.readonly'; //Интеграция модуля чтения
@@ -99,11 +99,11 @@ async function getAvailableTimeSlots(selectedDate) {
       singleEvents: true,
     });
 
-    moment.tz.setDefault('Europe/Samara');
+    moment.tz.setDefault('Europe/Moscow');
 
     const busySlots = response.data.items.map((event) => {
-      const start = moment(event.start.date || event.start.dateTime).subtract(4, 'Europe/Samara');
-      const end = moment(event.end.date || event.end.dateTime).subtract(4, 'Europe/Samara');
+      const start = moment(event.start.date || event.start.dateTime).subtract(4, 'Europe/Moscow');
+      const end = moment(event.end.date || event.end.dateTime).subtract(4, 'Europe/Moscow');
       return {
         start: start.hour(),
         end: end.hour(),
@@ -208,11 +208,11 @@ async function updateEvent(eventId, eventDetails) {
       description: eventDetails.description,
       start: {
         dateTime: eventDetails.startDateTime,
-        timeZone: 'Europe/Samara', // Укажите свой часовой пояс
+        timeZone: 'Europe/Moscow',
       },
       end: {
         dateTime: eventDetails.endDateTime,
-        timeZone: 'Europe/Samara',
+        timeZone: 'Europe/Moscow',
       },
     };
 
@@ -239,11 +239,11 @@ async function createEvent(eventDetails, chatId) {
       description: eventDetails.description,
       start: {
         dateTime: eventDetails.startDateTime,
-        timeZone: 'Europe/Samara', // Укажите свой часовой пояс
+        timeZone: 'Europe/Moscow',
       },
       end: {
         dateTime: eventDetails.endDateTime,
-        timeZone: 'Europe/Samara',
+        timeZone: 'Europe/Moscow',
       },
     };
 

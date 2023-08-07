@@ -39,7 +39,7 @@ async function sendFileToAdmin (bot, AdminchatId, filepath, msg) {
 
 //Функция для получения даты завтрашнего дня
 function getTomorrow(moment) {
-  const tomorrow = moment().tz('Europe/Samara').add(1, 'day').startOf('day');
+  const tomorrow = moment().tz('Europe/Moscow').add(1, 'day').startOf('day');
   return tomorrow;
 }
 
